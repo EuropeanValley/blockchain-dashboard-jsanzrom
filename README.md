@@ -9,10 +9,10 @@ Update this README every week.
 
 | Field | Value |
 |---|---|
-| Student Name | |
-| GitHub Username | |
-| Project Title | |
-| Chosen AI Approach | |
+| Student Name |Jorge Sanz Romera |
+| GitHub Username |jsanzrom |
+| Project Title |Bitcoin Cryptography Dashboard |
+| Chosen AI Approach |Anomaly detection on Bitcoin block inter-arrival times |
 
 ## Module Tracking
 
@@ -20,10 +20,10 @@ Use one of these values: `Not started`, `In progress`, `Done`
 
 | Module | What it should include | Status |
 |---|---|---|
-| M1 | Proof of Work Monitor | Not started |
+| M1 | Proof of Work Monitor | In progress |
 | M2 | Block Header Analyzer | Not started |
 | M3 | Difficulty History | Not started |
-| M4 | AI Component | Not started |
+| M4 | AI Component | Planned |
 
 ## Current Progress
 
