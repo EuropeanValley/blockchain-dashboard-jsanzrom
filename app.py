@@ -3,9 +3,9 @@
 import streamlit as st
 
 from modules.m1_pow_monitor import render as render_m1
-from modules.m2_block_header import render as render_m2
-from modules.m3_difficulty_history import render as render_m3
-from modules.m4_ai_component import render as render_m4
+#from modules.m2_header_analyzer import render as render_m2
+#from modules.m3_difficulty_history import render as render_m3
+#from modules.m4_ai_component import render as render_m4
 
 st.set_page_config(page_title="Blockchain Dashboard", layout="wide")
 
