@@ -29,21 +29,21 @@ Use one of these values: `Not started`, `In progress`, `Done`
 
 Write 3 to 5 short lines about what you have already done.
 
-- 
-- 
+- Modify README.md
+- Thrown a test of the API request
 - 
 
 ## Next Step
 
 Write the next small step you will do before the next class.
 
-- 
+- Beginig with the first dashboard
 
 ## Main Problem or Blocker
 
 Write here if you are stuck with something.
 
-- 
+- Nothing
 
 ## How to Run
 
@@ -60,6 +60,7 @@ template-blockchain-dashboard/
 |-- requirements.txt
 |-- .gitignore
 |-- app.py
+|-- test_api.py
 |-- api/
 |   `-- blockchain_client.py
 `-- modules/
