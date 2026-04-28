@@ -7,9 +7,7 @@ st.set_page_config(page_title="Blockchain Dashboard", layout="wide")
 
 st.title("Blockchain Dashboard")
 
-tab1, tab2 = st.tabs(
-    ["M1 - PoW Monitor", "M2 - Block Header"]
-)
+tab1, tab2 = st.tabs(["M1 - PoW Monitor", "M2 - Block Header"])
 
 with tab1:
     render_m1()
