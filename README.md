@@ -9,10 +9,10 @@ Update this README every week.
 
 | Field | Value |
 |---|---|
-| Student Name |Jorge Sanz Romera |
-| GitHub Username |jsanzrom |
-| Project Title |Bitcoin Cryptography Dashboard |
-| Chosen AI Approach |Anomaly detection on Bitcoin block inter-arrival times |
+| Student Name | Jorge Sanz Romera |
+| GitHub Username | jsanzrom |
+| Project Title | Bitcoin Cryptography Dashboard |
+| Chosen AI Approach | Anomaly detection on Bitcoin block inter-arrival times |
 
 ## Module Tracking
 
@@ -21,7 +21,7 @@ Use one of these values: `Not started`, `In progress`, `Done`
 | Module | What it should include | Status |
 |---|---|---|
 | M1 | Proof of Work Monitor | In progress |
-| M2 | Block Header Analyzer | Not started |
+| M2 | Block Header Analyzer | In progress |
 | M3 | Difficulty History | Not started |
 | M4 | AI Component | Planned |
 
@@ -29,32 +29,30 @@ Use one of these values: `Not started`, `In progress`, `Done`
 
 Write 3 to 5 short lines about what you have already done.
 
-- Modify README.md
-- Thrown a test of the API request
-- 
+- Updated README.md with the current project status
+- Connected the project to the Mempool.space API
+- Tested the API request successfully and retrieved real Bitcoin block data
+- Implemented the first working version of the M1 dashboard
+- Started adapting M2 to the current API structure
 
 ## Next Step
 
 Write the next small step you will do before the next class.
 
-- Beginig with the first dashboard
+- Continue developing M2 and display the main fields of the latest Bitcoin block header
 
 ## Main Problem or Blocker
 
 Write here if you are stuck with something.
 
-- Nothing
+- Adapting the remaining modules to the Mempool.space response format
 
 ## How to Run
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
-```
 
-## Project Structure
-
-```text
 template-blockchain-dashboard/
 |-- README.md
 |-- requirements.txt
@@ -68,7 +66,8 @@ template-blockchain-dashboard/
     |-- m2_block_header.py
     |-- m3_difficulty_history.py
     `-- m4_ai_component.py
-```
+
+
 
 <!-- student-repo-auditor:teacher-feedback:start -->
 ## Teacher Feedback
