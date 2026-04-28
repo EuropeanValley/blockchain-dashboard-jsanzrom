@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from api.blockchain_client import get_recent_blocks
@@ -8,36 +9,44 @@ from api.blockchain_client import get_recent_blocks
 
 def render() -> None:
     st.header("M4 · AI Component")
-    st.write("Initial skeleton for the AI module based on anomaly detection.")
+    st.write("Initial anomaly detection on Bitcoin block inter-arrival times.")
 
     st.subheader("Chosen AI Approach")
     st.write(
-        "This project will use anomaly detection on Bitcoin block inter-arrival times. "
-        "The idea is to identify blocks whose arrival time is unusually short or unusually long "
+        "This project uses anomaly detection on Bitcoin block inter-arrival times. "
+        "The goal is to identify blocks whose arrival times are unusually short or unusually long "
         "compared with the expected behaviour of the Bitcoin network."
     )
 
     st.subheader("Why this approach?")
     st.write(
-        "Bitcoin block arrivals are expected to follow a probabilistic process with an average "
-        "target of 600 seconds per block. Large deviations may be interesting for analysis, "
-        "so anomaly detection is a suitable first AI approach for this project."
+        "Bitcoin block arrivals are stochastic and target an average of 600 seconds per block. "
+        "Large deviations from typical values may be interesting for analysis, so anomaly detection "
+        "is a suitable AI approach for this project."
     )
 
     sample_size = st.slider(
-        "Number of recent blocks for AI preview",
+        "Number of recent blocks for anomaly detection",
         min_value=20,
         max_value=120,
-        value=40,
+        value=50,
         step=10,
     )
 
-    if st.button("Prepare AI preview data", key="m4_preview"):
+    z_threshold = st.slider(
+        "Z-score threshold for anomaly detection",
+        min_value=1.0,
+        max_value=3.5,
+        value=2.0,
+        step=0.1,
+    )
+
+    if st.button("Run anomaly detection", key="m4_anomaly"):
         try:
             blocks = get_recent_blocks(sample_size)
 
-            if len(blocks) < 2:
-                st.warning("Not enough blocks to prepare AI preview data.")
+            if len(blocks) < 3:
+                st.warning("Not enough blocks to run anomaly detection.")
                 return
 
             rows = []
@@ -58,23 +67,80 @@ def render() -> None:
             )
             df["inter_arrival_seconds"] = df["timestamp"].diff()
 
-            preview_df = df[["height", "datetime", "difficulty", "inter_arrival_seconds"]].copy()
+            df = df.dropna().reset_index(drop=True)
 
-            st.success("AI preview data prepared successfully")
+            mean_time = df["inter_arrival_seconds"].mean()
+            std_time = df["inter_arrival_seconds"].std()
 
-            st.subheader("Prepared Data Preview")
-            st.dataframe(preview_df, width="stretch")
+            if std_time == 0 or pd.isna(std_time):
+                st.warning("Inter-arrival times do not vary enough to detect anomalies.")
+                return
 
-            mean_time = preview_df["inter_arrival_seconds"].dropna().mean()
+            df["z_score"] = (df["inter_arrival_seconds"] - mean_time) / std_time
+            df["is_anomaly"] = df["z_score"].abs() > z_threshold
+            df["anomaly_type"] = df["z_score"].apply(
+                lambda z: "Fast block" if z < -z_threshold else (
+                    "Slow block" if z > z_threshold else "Normal"
+                )
+            )
 
-            st.subheader("Initial Observation")
-            st.write(f"Average inter-arrival time in this sample: **{mean_time:.2f} seconds**")
+            anomaly_count = int(df["is_anomaly"].sum())
+            anomaly_ratio = anomaly_count / len(df)
+
+            st.success("Anomaly detection completed successfully")
+
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Average block time", f"{mean_time:.2f} s")
+            col2.metric("Std deviation", f"{std_time:.2f} s")
+            col3.metric("Detected anomalies", f"{anomaly_count} / {len(df)}")
+
+            st.subheader("Inter-arrival Time Series")
+            fig = px.scatter(
+                df,
+                x="datetime",
+                y="inter_arrival_seconds",
+                color="anomaly_type",
+                hover_data=["height", "z_score"],
+                title="Block Inter-arrival Times with Detected Anomalies",
+            )
+
+            fig.update_layout(
+                xaxis_title="Time",
+                yaxis_title="Inter-arrival time (seconds)",
+            )
+
+            st.plotly_chart(fig, width="stretch")
+
+            st.subheader("Detected Anomalies")
+            anomalies_df = df[df["is_anomaly"]].copy()
+
+            if anomalies_df.empty:
+                st.write("No anomalies detected with the selected threshold.")
+            else:
+                st.dataframe(
+                    anomalies_df[
+                        [
+                            "height",
+                            "datetime",
+                            "inter_arrival_seconds",
+                            "z_score",
+                            "anomaly_type",
+                        ]
+                    ].reset_index(drop=True),
+                    width="stretch",
+                )
+
+            st.subheader("Interpretation")
+            st.write(
+                f"In this sample, {anomaly_count} out of {len(df)} blocks "
+                f"({anomaly_ratio:.2%}) were marked as anomalous using a z-score threshold of {z_threshold:.1f}."
+            )
 
             st.info(
-                "This is only the initial skeleton of M4. "
-                "In the next phase, the module will apply an anomaly detection method "
-                "to these inter-arrival times and highlight unusual blocks."
+                "This is an initial anomaly detection baseline based on z-scores. "
+                "A later version of the project may compare this simple statistical method "
+                "with a more advanced machine learning model."
             )
 
         except Exception as exc:
-            st.error(f"Error preparing AI preview data: {exc}")
+            st.error(f"Error running anomaly detection: {exc}")
