@@ -1,38 +1,48 @@
-"""Starter file for module M2."""
-
 import streamlit as st
+from datetime import datetime
 
-from api.blockchain_client import get_block
+from api.blockchain_client import get_latest_block
 
 
 def render() -> None:
-    """Render the M2 panel."""
-    st.header("M2 - Block Header Analyzer")
-    st.write("Use this module to inspect the fields of one block header.")
+    st.header("M2 · Block Header Analyzer")
+    st.write("Inspect the main fields of the latest Bitcoin block header.")
 
-    block_hash = st.text_input(
-        "Block hash",
-        placeholder="Enter a block hash",
-        key="m2_hash",
-    )
+    if st.button("Load latest block header", key="m2_load"):
+        try:
+            block = get_latest_block()
 
-    if st.button("Look up block", key="m2_lookup") and block_hash:
-        with st.spinner("Fetching data..."):
-            try:
-                block = get_block(block_hash)
-                st.subheader("Block header fields")
-                header_fields = {
-                    "Hash": block.get("hash"),
-                    "Height": block.get("height"),
-                    "Time": block.get("time"),
-                    "Nonce": block.get("nonce"),
-                    "Bits": block.get("bits"),
-                    "Merkle root": block.get("mrkl_root"),
-                    "Previous block": block.get("prev_block"),
-                }
-                for label, value in header_fields.items():
-                    st.write(f"**{label}:** {value}")
-            except Exception as exc:
-                st.error(f"Error fetching block: {exc}")
-    elif not block_hash:
-        st.info("Enter a block hash and click Look up block.")
+            version = block.get("version", "N/A")
+            prev_hash = block.get("previousblockhash", "N/A")
+            merkle_root = block.get("merkle_root", "N/A")
+            timestamp = block.get("timestamp")
+            bits = block.get("bits", "N/A")
+            nonce = block.get("nonce", "N/A")
+            block_hash = block.get("id", "N/A")
+            height = block.get("height", "N/A")
+
+            if timestamp:
+                readable_time = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S UTC")
+            else:
+                readable_time = "N/A"
+
+            st.success("Latest block header loaded successfully")
+
+            st.write(f"**Block Height:** {height}")
+            st.write(f"**Block Hash:** `{block_hash}`")
+
+            st.subheader("Header Fields")
+            st.write(f"**Version:** {version}")
+            st.write(f"**Previous Block Hash:** `{prev_hash}`")
+            st.write(f"**Merkle Root:** `{merkle_root}`")
+            st.write(f"**Timestamp:** {readable_time}")
+            st.write(f"**Bits:** {bits}")
+            st.write(f"**Nonce:** {nonce}")
+
+            st.info(
+                "These are the six main fields used to build the 80-byte Bitcoin block header. "
+                "In the next phase, this module will serialize the header and verify Proof of Work locally."
+            )
+
+        except Exception as exc:
+            st.error(f"Error fetching block header: {exc}")
