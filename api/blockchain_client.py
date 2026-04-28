@@ -67,3 +67,65 @@ def get_recent_blocks(count: int = 20) -> list[dict]:
         current_hash = previous_hash
 
     return blocks
+
+
+def get_block_by_height(height: int) -> dict:
+    """Return full block data for a given block height."""
+    block_hash = get_block_hash_by_height(height)
+    return get_block(block_hash)
+
+
+def get_difficulty_adjustment_periods(period_count: int = 6) -> list[dict]:
+    """
+    Return summary data for the latest completed Bitcoin difficulty adjustment periods.
+
+    Each period spans 2016 blocks. For every completed period, this function returns:
+    - start and end heights
+    - start and end timestamps
+    - end difficulty
+    - actual average block time
+    - ratio vs the 600-second target
+    """
+    tip_height = get_tip_height()
+
+    # Last completed adjustment boundary
+    last_completed_boundary = (tip_height // 2016) * 2016
+
+    periods = []
+
+    for i in range(period_count):
+        end_height = last_completed_boundary - (i * 2016)
+        start_height = end_height - 2016
+
+        if start_height < 0:
+            break
+
+        start_block = get_block_by_height(start_height)
+        end_block = get_block_by_height(end_height)
+
+        start_ts = start_block.get("timestamp")
+        end_ts = end_block.get("timestamp")
+        difficulty = end_block.get("difficulty")
+
+        if start_ts is None or end_ts is None or difficulty is None:
+            continue
+
+        total_seconds = end_ts - start_ts
+        average_block_time = total_seconds / 2016
+        ratio_vs_target = average_block_time / 600
+
+        periods.append(
+            {
+                "start_height": start_height,
+                "end_height": end_height,
+                "start_timestamp": start_ts,
+                "end_timestamp": end_ts,
+                "difficulty": difficulty,
+                "total_seconds": total_seconds,
+                "average_block_time": average_block_time,
+                "ratio_vs_target": ratio_vs_target,
+            }
+        )
+
+    periods.reverse()
+    return periods
