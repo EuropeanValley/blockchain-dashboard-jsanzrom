@@ -60,7 +60,7 @@ def count_leading_zero_bits(hex_hash: str) -> int:
 
 def render() -> None:
     st.header("M2 · Block Header Analyzer")
-    st.write("Inspect the latest Bitcoin block header and verify Proof of Work locally.")
+    st.write("Local verification of the latest Bitcoin block header and Proof of Work.")
 
     if st.button("Analyze latest block header", key="m2_analyze"):
         try:
@@ -93,7 +93,6 @@ def render() -> None:
 
             target = bits_to_target(bits)
             calculated_hash_int = int(calculated_hash_hex, 16)
-            api_hash_int = int(block_hash, 16)
 
             pow_valid = calculated_hash_int < target
             matches_api_hash = calculated_hash_hex == block_hash
@@ -104,30 +103,38 @@ def render() -> None:
             st.success("Block header analyzed successfully")
 
             st.subheader("Block Identification")
-            st.write(f"**Block Height:** {height}")
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Block Height", height)
+            col2.metric("Header Length", f"{len(header_bytes)} bytes")
+            col3.metric("Leading Zero Bits", leading_zero_bits)
+
             st.write(f"**Block Hash (API):** `{block_hash}`")
             st.write(f"**Timestamp:** {readable_time}")
 
             st.subheader("Header Fields")
-            st.write(f"**Version:** {version}")
-            st.write(f"**Previous Block Hash:** `{prev_hash}`")
-            st.write(f"**Merkle Root:** `{merkle_root}`")
-            st.write(f"**Bits:** {bits}")
-            st.write(f"**Nonce:** {nonce}")
+            left_col, right_col = st.columns(2)
+
+            with left_col:
+                st.write(f"**Version:** {version}")
+                st.write(f"**Previous Block Hash:** `{prev_hash}`")
+                st.write(f"**Merkle Root:** `{merkle_root}`")
+
+            with right_col:
+                st.write(f"**Bits:** {bits}")
+                st.write(f"**Nonce:** {nonce}")
+                st.write(f"**Target (decimal):** {target}")
 
             st.subheader("Local Verification")
-            st.write(f"**Serialized Header Length:** {len(header_bytes)} bytes")
+            col4, col5 = st.columns(2)
+            col4.metric("Matches API Hash", "Yes" if matches_api_hash else "No")
+            col5.metric("Hash < Target", "Yes" if pow_valid else "No")
+
             st.write(f"**Serialized Header (hex):** `{header_bytes.hex()}`")
             st.write(f"**Calculated Double SHA-256:** `{calculated_hash_hex}`")
-            st.write(f"**Matches API Hash:** {matches_api_hash}")
-            st.write(f"**Target (decimal):** {target}")
-            st.write(f"**Hash < Target:** {pow_valid}")
-            st.write(f"**Leading Zero Bits:** {leading_zero_bits}")
 
             st.info(
-                "The Bitcoin block header is 80 bytes long. "
-                "Proof of Work is valid when the double SHA-256 hash of the header "
-                "is numerically smaller than the target encoded in the bits field."
+                "This module rebuilds the 80-byte Bitcoin block header, applies double SHA-256 locally, "
+                "and checks whether the resulting hash is below the target encoded by the bits field."
             )
 
         except Exception as exc:
