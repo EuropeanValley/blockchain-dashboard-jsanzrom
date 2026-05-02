@@ -9,12 +9,13 @@ from api.blockchain_client import get_recent_blocks
 
 def render() -> None:
     st.header("M7 · Second AI Approach")
-    st.write("Alternative AI approach based on quantile classification of Bitcoin block inter-arrival times.")
+    st.write("Alternative anomaly analysis based on quantile classification of Bitcoin block inter-arrival times.")
 
-    st.subheader("Approach")
+    st.subheader("Model Idea")
     st.write(
         "This module applies a second analytical approach different from M4. "
-        "Instead of using z-scores, it classifies block inter-arrival times using lower and upper quantiles."
+        "Instead of using z-scores, it classifies block inter-arrival times with "
+        "empirical lower and upper quantile thresholds."
     )
 
     sample_size = st.slider(
@@ -97,8 +98,9 @@ def render() -> None:
             col4.metric("Sample size", len(df))
 
             st.subheader("Quantile Thresholds")
-            st.write(f"**Lower threshold ({low_quantile:.2f}):** {low_threshold:.2f} seconds")
-            st.write(f"**Upper threshold ({high_quantile:.2f}):** {high_threshold:.2f} seconds")
+            col5, col6 = st.columns(2)
+            col5.metric(f"Lower threshold ({low_quantile:.2f})", f"{low_threshold:.2f} s")
+            col6.metric(f"Upper threshold ({high_quantile:.2f})", f"{high_threshold:.2f} s")
 
             st.subheader("Classification Result")
             fig = px.scatter(
@@ -132,9 +134,9 @@ def render() -> None:
             )
 
             st.info(
-                "This second AI approach differs from M4 because it does not use z-scores. "
-                "Instead, it classifies blocks according to empirical quantile thresholds. "
-                "This makes it useful for comparing two different anomaly-detection styles."
+                "Unlike M4, which uses z-scores, this module uses empirical quantile thresholds. "
+                "That makes it useful for comparing two different anomaly-detection styles: "
+                "a standard-deviation-based baseline versus a distribution-threshold approach."
             )
 
         except Exception as exc:
