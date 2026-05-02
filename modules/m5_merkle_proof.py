@@ -46,6 +46,8 @@ def render() -> None:
         col2.metric("Transactions", tx_count)
         col3.metric("Merkle Root", merkle_root[:16] + "...")
 
+        st.write(f"**Block Hash:** `{block_hash}`")
+
         txids = get_block_txids(block_hash)
 
         if not txids:
@@ -61,7 +63,10 @@ def render() -> None:
         )
 
         selected_txid = txids[tx_index]
-        st.write(f"**Selected TXID:** `{selected_txid}`")
+
+        st.subheader("Selected Transaction")
+        st.write(f"**TXID:** `{selected_txid}`")
+        st.write(f"**Position in block:** {tx_index}")
 
         if st.button("Verify Merkle proof", key="m5_verify"):
             proof = get_tx_merkle_proof(selected_txid)
@@ -81,22 +86,22 @@ def render() -> None:
                 if current_pos % 2 == 0:
                     left_hash = current_hash
                     right_hash = sibling_hash
-                    direction = "current hash on LEFT"
+                    direction = "Current hash on LEFT"
                 else:
                     left_hash = sibling_hash
                     right_hash = current_hash
-                    direction = "current hash on RIGHT"
+                    direction = "Current hash on RIGHT"
 
                 parent_hash = merkle_parent(left_hash, right_hash)
 
                 steps.append(
                     {
-                        "level": level,
-                        "position": current_pos,
-                        "direction": direction,
-                        "left_hash": left_hash,
-                        "right_hash": right_hash,
-                        "parent_hash": parent_hash,
+                        "Level": level,
+                        "Position": current_pos,
+                        "Direction": direction,
+                        "Left Hash": left_hash,
+                        "Right Hash": right_hash,
+                        "Parent Hash": parent_hash,
                     }
                 )
 
@@ -109,9 +114,12 @@ def render() -> None:
             st.success("Merkle proof processed successfully")
 
             st.subheader("Verification Result")
+            col4, col5 = st.columns(2)
+            col4.metric("Calculated Root", calculated_root[:16] + "...")
+            col5.metric("Proof Valid", "Yes" if proof_valid else "No")
+
             st.write(f"**Block Merkle Root:** `{merkle_root}`")
             st.write(f"**Calculated Root from Proof:** `{calculated_root}`")
-            st.write(f"**Proof Valid:** {proof_valid}")
 
             st.subheader("Step-by-Step Hash Computation")
             df = pd.DataFrame(steps)
