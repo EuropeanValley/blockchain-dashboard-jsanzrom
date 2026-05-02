@@ -9,7 +9,7 @@ from api.blockchain_client import get_difficulty_adjustment_periods
 
 def render() -> None:
     st.header("M3 · Difficulty History")
-    st.write("Difficulty evolution over recent completed Bitcoin adjustment periods.")
+    st.write("Difficulty evolution across recent completed Bitcoin adjustment periods.")
 
     period_count = st.slider(
         "Number of completed adjustment periods",
@@ -46,6 +46,8 @@ def render() -> None:
             df["difficulty_change_direction"] = df["ratio_vs_target"].apply(
                 lambda x: "Faster than target" if x < 1 else "Slower than target"
             )
+            df["difficulty_change_pct"] = df["difficulty"].pct_change() * 100
+            df["difficulty_change_pct"] = df["difficulty_change_pct"].round(2)
 
             st.success("Difficulty adjustment history loaded successfully")
 
@@ -60,7 +62,7 @@ def render() -> None:
 
             st.subheader("Difficulty by Adjustment Period")
 
-            fig = px.line(
+            fig1 = px.line(
                 df,
                 x="end_datetime",
                 y="difficulty",
@@ -69,13 +71,29 @@ def render() -> None:
                 title="Bitcoin Difficulty Across Adjustment Periods",
             )
 
-            fig.update_traces(textposition="top center")
-            fig.update_layout(
+            fig1.update_traces(textposition="top center")
+            fig1.update_layout(
                 xaxis_title="Adjustment Date",
                 yaxis_title="Difficulty",
             )
 
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig1, width="stretch")
+
+            st.subheader("Actual Block Time Ratio vs 600-Second Target")
+
+            fig2 = px.bar(
+                df,
+                x="period_label",
+                y="ratio_vs_target",
+                title="Actual Average Block Time / 600-Second Target",
+            )
+
+            fig2.update_layout(
+                xaxis_title="Adjustment Period (heights)",
+                yaxis_title="Ratio vs target",
+            )
+
+            st.plotly_chart(fig2, width="stretch")
 
             st.subheader("Adjustment Event Summary")
             summary_df = df[
@@ -84,6 +102,7 @@ def render() -> None:
                     "start_datetime",
                     "end_datetime",
                     "difficulty",
+                    "difficulty_change_pct",
                     "avg_block_time_seconds",
                     "ratio_vs_target",
                     "difficulty_change_direction",
@@ -96,6 +115,7 @@ def render() -> None:
                     "start_datetime": "Start",
                     "end_datetime": "Adjustment event",
                     "difficulty": "Difficulty",
+                    "difficulty_change_pct": "Difficulty change (%)",
                     "avg_block_time_seconds": "Avg block time (s)",
                     "ratio_vs_target": "Actual/600 ratio",
                     "difficulty_change_direction": "Interpretation",
@@ -105,10 +125,9 @@ def render() -> None:
             st.dataframe(summary_df, width="stretch")
 
             st.info(
-                "Each point on the chart represents a Bitcoin difficulty adjustment event, "
-                "which happens every 2016 blocks. "
-                "The ratio compares the actual average block time in that period against "
-                "the theoretical target of 600 seconds per block."
+                "Each point represents a completed Bitcoin difficulty adjustment event, which occurs every 2016 blocks. "
+                "The ratio compares the actual average block time in that period against the target of 600 seconds. "
+                "If the ratio is below 1, blocks arrived faster than expected; if it is above 1, they arrived more slowly."
             )
 
         except Exception as exc:
