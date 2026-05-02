@@ -9,20 +9,13 @@ from api.blockchain_client import get_recent_blocks
 
 def render() -> None:
     st.header("M4 · AI Component")
-    st.write("Initial anomaly detection on Bitcoin block inter-arrival times.")
+    st.write("Anomaly detection on Bitcoin block inter-arrival times.")
 
-    st.subheader("Chosen AI Approach")
+    st.subheader("Model Idea")
     st.write(
-        "This project uses anomaly detection on Bitcoin block inter-arrival times. "
-        "The goal is to identify blocks whose arrival times are unusually short or unusually long "
-        "compared with the expected behaviour of the Bitcoin network."
-    )
-
-    st.subheader("Why this approach?")
-    st.write(
-        "Bitcoin block arrivals are stochastic and target an average of 600 seconds per block. "
-        "Large deviations from typical values may be interesting for analysis, so anomaly detection "
-        "is a suitable AI approach for this project."
+        "This module applies a statistical anomaly detection baseline using z-scores "
+        "on Bitcoin block inter-arrival times. Blocks with unusually short or long "
+        "arrival times are flagged as potential anomalies."
     )
 
     sample_size = st.slider(
@@ -34,7 +27,7 @@ def render() -> None:
     )
 
     z_threshold = st.slider(
-        "Z-score threshold for anomaly detection",
+        "Z-score threshold",
         min_value=1.0,
         max_value=3.5,
         value=2.0,
@@ -66,7 +59,6 @@ def render() -> None:
                 lambda ts: datetime.utcfromtimestamp(ts)
             )
             df["inter_arrival_seconds"] = df["timestamp"].diff()
-
             df = df.dropna().reset_index(drop=True)
 
             mean_time = df["inter_arrival_seconds"].mean()
@@ -85,22 +77,29 @@ def render() -> None:
             )
 
             anomaly_count = int(df["is_anomaly"].sum())
+            fast_count = int((df["anomaly_type"] == "Fast block").sum())
+            slow_count = int((df["anomaly_type"] == "Slow block").sum())
             anomaly_ratio = anomaly_count / len(df)
 
             st.success("Anomaly detection completed successfully")
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             col1.metric("Average block time", f"{mean_time:.2f} s")
             col2.metric("Std deviation", f"{std_time:.2f} s")
             col3.metric("Detected anomalies", f"{anomaly_count} / {len(df)}")
+            col4.metric("Threshold", f"{z_threshold:.1f}")
 
-            st.subheader("Inter-arrival Time Series")
+            col5, col6 = st.columns(2)
+            col5.metric("Fast anomalies", fast_count)
+            col6.metric("Slow anomalies", slow_count)
+
+            st.subheader("Anomaly Detection Result")
             fig = px.scatter(
                 df,
                 x="datetime",
                 y="inter_arrival_seconds",
                 color="anomaly_type",
-                hover_data=["height", "z_score"],
+                hover_data=["height", "z_score", "difficulty"],
                 title="Block Inter-arrival Times with Detected Anomalies",
             )
 
@@ -122,6 +121,7 @@ def render() -> None:
                         [
                             "height",
                             "datetime",
+                            "difficulty",
                             "inter_arrival_seconds",
                             "z_score",
                             "anomaly_type",
@@ -133,13 +133,13 @@ def render() -> None:
             st.subheader("Interpretation")
             st.write(
                 f"In this sample, {anomaly_count} out of {len(df)} blocks "
-                f"({anomaly_ratio:.2%}) were marked as anomalous using a z-score threshold of {z_threshold:.1f}."
+                f"({anomaly_ratio:.2%}) were classified as anomalous using a z-score "
+                f"threshold of {z_threshold:.1f}."
             )
 
             st.info(
-                "This is an initial anomaly detection baseline based on z-scores. "
-                "A later version of the project may compare this simple statistical method "
-                "with a more advanced machine learning model."
+                "This is a baseline anomaly detector. It is simple and interpretable, "
+                "but later it can be compared with a more advanced machine learning method."
             )
 
         except Exception as exc:
