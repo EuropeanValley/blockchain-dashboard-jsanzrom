@@ -34,9 +34,6 @@ def simple_attack_success_probability(confirmations: int) -> float:
     """
     Simple illustrative risk model:
     more confirmations -> lower approximate attack success probability.
-
-    This is not the full Nakamoto formula, only a first visual approximation
-    for dashboard purposes.
     """
     return math.exp(-0.5 * confirmations)
 
@@ -57,6 +54,7 @@ def render() -> None:
 
         network_hashrate = estimate_network_hashrate(difficulty)
         attack_hashrate = 0.51 * network_hashrate
+        attack_hashrate_th = attack_hashrate / 1e12
 
         st.subheader("Live Network Security Metrics")
 
@@ -79,12 +77,35 @@ def render() -> None:
             format="%.3f",
         )
 
-        attack_hashrate_th = attack_hashrate / 1e12
         attack_cost_per_hour = attack_hashrate_th * cost_per_th_per_hour
 
         col4, col5 = st.columns(2)
         col4.metric("Attack Hash Rate Needed", f"{attack_hashrate_th:,.2f} TH/s")
         col5.metric("Estimated Attack Cost", f"${attack_cost_per_hour:,.2f} / hour")
+
+        st.subheader("Attack Cost Sensitivity")
+
+        price_values = [0.005, 0.01, 0.02, 0.05, 0.10]
+        cost_df = pd.DataFrame(
+            {
+                "cost_per_th_per_hour": price_values,
+                "attack_cost_per_hour_usd": [
+                    attack_hashrate_th * price for price in price_values
+                ],
+            }
+        )
+
+        fig1 = px.bar(
+            cost_df,
+            x="cost_per_th_per_hour",
+            y="attack_cost_per_hour_usd",
+            title="Estimated 51% Attack Cost for Different Market Rental Prices",
+        )
+        fig1.update_layout(
+            xaxis_title="Rental cost per TH/s per hour (USD)",
+            yaxis_title="Estimated attack cost per hour (USD)",
+        )
+        st.plotly_chart(fig1, width="stretch")
 
         st.subheader("Security vs Confirmations")
 
@@ -93,34 +114,40 @@ def render() -> None:
             simple_attack_success_probability(c) for c in confirmation_values
         ]
 
-        df = pd.DataFrame(
+        risk_df = pd.DataFrame(
             {
                 "confirmations": confirmation_values,
                 "attack_success_probability": risk_values,
             }
         )
 
-        fig = px.line(
-            df,
+        fig2 = px.line(
+            risk_df,
             x="confirmations",
             y="attack_success_probability",
             markers=True,
             title="Illustrative Attack Success Probability vs Confirmations",
         )
-
-        fig.update_layout(
+        fig2.update_layout(
             xaxis_title="Number of Confirmations",
-            yaxis_title="Approximate Attack Success Probability",
+            yaxis_title="Approximate attack success probability",
         )
+        st.plotly_chart(fig2, width="stretch")
 
-        st.plotly_chart(fig, width="stretch")
-        st.dataframe(df, width="stretch")
+        st.subheader("Security Summary Table")
+
+        summary_df = risk_df.copy()
+        summary_df["attack_success_probability"] = summary_df[
+            "attack_success_probability"
+        ].round(6)
+
+        st.dataframe(summary_df, width="stretch")
 
         st.info(
-            "This module estimates the network hash rate from Bitcoin difficulty and "
-            "uses a user-defined market cost per TH/s to approximate the hourly cost "
-            "of a 51% attack. The confirmations chart is an initial security visualization "
-            "that will be improved later if needed."
+            "This module estimates network hash rate from Bitcoin difficulty and uses a "
+            "user-defined market cost per TH/s to approximate the hourly cost of a 51% attack. "
+            "The confirmations chart is an illustrative security model showing that the risk "
+            "of attack decreases as transaction confirmations increase."
         )
 
     except Exception as exc:
