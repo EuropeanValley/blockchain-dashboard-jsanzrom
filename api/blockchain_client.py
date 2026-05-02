@@ -129,3 +129,12 @@ def get_difficulty_adjustment_periods(period_count: int = 6) -> list[dict]:
 
     periods.reverse()
     return periods
+
+def get_block_txids(block_hash: str) -> list[str]:
+    """Return all transaction IDs for a given block hash."""
+    return _get(f"/block/{block_hash}/txids")
+
+
+def get_tx_merkle_proof(txid: str) -> dict:
+    """Return the Merkle inclusion proof for a transaction."""
+    return _get(f"/tx/{txid}/merkle-proof")
