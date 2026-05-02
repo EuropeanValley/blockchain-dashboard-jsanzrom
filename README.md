@@ -5,14 +5,41 @@
 Use this repository to build your blockchain dashboard project.
 Update this README every week.
 
+# Blockchain Dashboard Project
+
+Use this repository to build your blockchain dashboard project.
+Update this README every week.
+
 ## Student Information
 
 | Field | Value |
 |---|---|
 | Student Name | Jorge Sanz Romera |
 | GitHub Username | jsanzrom |
-| Project Title | Bitcoin Cryptography Dashboard |
-| Chosen AI Approach | Anomaly detection on Bitcoin block inter-arrival times |
+| Project Title | CryptoChain Analyzer Dashboard |
+| Chosen AI Approach | M4: Z-score anomaly detection on block inter-arrival times / M7: Quantile-based classification of inter-arrival times |
+
+## Project Overview
+
+This project is a real-time Bitcoin dashboard built in Python with Streamlit.
+It connects to public blockchain APIs and displays live cryptographic and blockchain-related metrics from the Bitcoin network.
+
+The dashboard includes:
+- Proof of Work monitoring
+- Block header verification
+- Difficulty adjustment history
+- AI-based anomaly detection
+- Merkle proof validation
+- Security estimation for 51% attacks
+- A second AI approach for comparative analysis
+
+## Main API
+
+- Mempool.space API
+
+## Dashboard Framework
+
+- Streamlit
 
 ## Module Tracking
 
@@ -20,32 +47,31 @@ Use one of these values: `Not started`, `In progress`, `Done`
 
 | Module | What it should include | Status |
 |---|---|---|
-| M1 | Proof of Work Monitor | In progress |
-| M2 | Block Header Analyzer | In progress |
-| M3 | Difficulty History | Not started |
-| M4 | AI Component | Planned |
+| M1 | Proof of Work Monitor | Done |
+| M2 | Block Header Analyzer | Done |
+| M3 | Difficulty History | Done |
+| M4 | AI Component | Done |
+| M5 | Merkle Proof Verifier | Done |
+| M6 | Security Score | Done |
+| M7 | Second AI Approach | Done |
 
 ## Current Progress
 
-Write 3 to 5 short lines about what you have already done.
-
-- Updated README.md with the current project status
-- Connected the project to the Mempool.space API
-- Tested the API request successfully and retrieved real Bitcoin block data
-- Implemented the first working version of the M1 dashboard
-- Started adapting M2 to the current API structure
+- Connected the dashboard to the Mempool.space API and successfully retrieved live Bitcoin data.
+- Implemented M1 with live PoW metrics and recent block timing analysis.
+- Implemented M2 with local block header serialization, double SHA-256, target decoding, and Proof-of-Work verification.
+- Implemented M3 with difficulty adjustment periods, historical evolution, and comparison against the 600-second target.
+- Implemented M4 and M7 as two different AI-based approaches for analyzing block inter-arrival times.
+- Implemented M5 to verify Bitcoin Merkle proofs step by step.
+- Implemented M6 to estimate the economic cost of a 51% attack and visualize confirmation-based security.
 
 ## Next Step
 
-Write the next small step you will do before the next class.
-
-- Continue developing M2 and display the main fields of the latest Bitcoin block header
+- Final polish of the dashboard and preparation of the final report PDF.
 
 ## Main Problem or Blocker
 
-Write here if you are stuck with something.
-
-- Adapting the remaining modules to the Mempool.space response format
+- No major blocker at the moment. The remaining work is final polishing, reviewing, and documenting the project clearly.
 
 ## How to Run
 
@@ -53,19 +79,23 @@ Write here if you are stuck with something.
 pip install -r requirements.txt
 streamlit run app.py
 
-template-blockchain-dashboard/
+blockchain-dashboard-jsanzrom/
 |-- README.md
 |-- requirements.txt
 |-- .gitignore
 |-- app.py
 |-- test_api.py
 |-- api/
+|   |-- __init__.py
 |   `-- blockchain_client.py
 `-- modules/
     |-- m1_pow_monitor.py
     |-- m2_block_header.py
     |-- m3_difficulty_history.py
-    `-- m4_ai_component.py
+    |-- m4_ai_component.py
+    |-- m5_merkle_proof.py
+    |-- m6_security_score.py
+    `-- m7_second_ai.py
 
 <!-- student-repo-auditor:teacher-feedback:start -->
 ## Teacher Feedback
