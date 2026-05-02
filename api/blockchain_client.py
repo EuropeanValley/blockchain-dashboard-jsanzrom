@@ -138,3 +138,11 @@ def get_block_txids(block_hash: str) -> list[str]:
 def get_tx_merkle_proof(txid: str) -> dict:
     """Return the Merkle inclusion proof for a transaction."""
     return _get(f"/tx/{txid}/merkle-proof")
+
+def get_recent_block_times(count: int = 20) -> list[dict]:
+    """
+    Return recent blocks with enough data to analyze inter-arrival times.
+    """
+    blocks = get_recent_blocks(count)
+    blocks = [b for b in blocks if b.get("height") is not None and b.get("timestamp") is not None]
+    return sorted(blocks, key=lambda b: b["height"])
