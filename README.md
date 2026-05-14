@@ -1,14 +1,9 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/N3kLi3ZO)
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=23640751&assignment_repo_type=AssignmentRepo)
-# Blockchain Dashboard Project
-
-Use this repository to build your blockchain dashboard project.
-Update this README every week.
 
 # Blockchain Dashboard Project
 
 Use this repository to build your blockchain dashboard project.
-Update this README every week.
 
 ## Student Information
 
@@ -21,7 +16,7 @@ Update this README every week.
 
 ## Project Overview
 
-This project is a real-time Bitcoin dashboard built in Python with Streamlit.
+This project is a real-time Bitcoin dashboard built in Python with Streamlit.  
 It connects to public blockchain APIs and displays live cryptographic and blockchain-related metrics from the Bitcoin network.
 
 The dashboard includes:
@@ -57,21 +52,22 @@ Use one of these values: `Not started`, `In progress`, `Done`
 
 ## Current Progress
 
-- Connected the dashboard to the Mempool.space API and successfully retrieved live Bitcoin data.
-- Implemented M1 with live PoW metrics and recent block timing analysis.
+- Connected the dashboard to the Mempool.space API and retrieved live Bitcoin blockchain data.
+- Implemented M1 with live Proof-of-Work metrics and recent block timing analysis.
 - Implemented M2 with local block header serialization, double SHA-256, target decoding, and Proof-of-Work verification.
 - Implemented M3 with difficulty adjustment periods, historical evolution, and comparison against the 600-second target.
-- Implemented M4 and M7 as two different AI-based approaches for analyzing block inter-arrival times.
+- Implemented M4 and M7 as two different AI-based approaches for analyzing Bitcoin block inter-arrival times.
 - Implemented M5 to verify Bitcoin Merkle proofs step by step.
 - Implemented M6 to estimate the economic cost of a 51% attack and visualize confirmation-based security.
+- Added the final PDF report to the repository.
 
 ## Next Step
 
-- Final polish of the dashboard and preparation of the final report PDF.
+- Project completed. Final review and submission.
 
 ## Main Problem or Blocker
 
-- No major blocker at the moment. The remaining work is final polishing, reviewing, and documenting the project clearly.
+- No current blocker. The project is complete and ready for final delivery.
 
 ## How to Run
 
@@ -85,6 +81,7 @@ blockchain-dashboard-jsanzrom/
 |-- .gitignore
 |-- app.py
 |-- test_api.py
+|-- CryptoChain_Analyzer_Final_Report_Jorge_Sanz_Romera.pdf
 |-- api/
 |   |-- __init__.py
 |   `-- blockchain_client.py
